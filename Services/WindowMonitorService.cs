@@ -25,6 +25,10 @@ namespace PrivacyFilter.Services
         [DllImport("user32.dll")]
         private static extern IntPtr GetAncestor(IntPtr hWnd, uint gaFlags);
 
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool IsWindowVisible(IntPtr hWnd);
+
         private const uint GA_ROOT = 2;
         private const uint GA_ROOTOWNER = 3;
 
@@ -184,8 +188,9 @@ namespace PrivacyFilter.Services
 
                     var processRoot = NormalizeToRootWindow(process.MainWindowHandle);
 
-                    var isActive = processRoot != IntPtr.Zero && processRoot == activatedRoot
-                        || (activatedPid != 0 && pidMatchCount == 1 && process.Id == activatedPid);
+                    var isActive = (processRoot != IntPtr.Zero && processRoot == activatedRoot
+                        || (activatedPid != 0 && pidMatchCount == 1 && process.Id == activatedPid))
+                        && IsWindowVisible(process.MainWindowHandle);
 
                     if (isActive)
                     {
