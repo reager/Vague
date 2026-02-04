@@ -11,7 +11,7 @@ $InstallerDir = Join-Path $ProjectRoot "Installer"
 $OutputDir = Join-Path $InstallerDir "bin\$Configuration"
 
 Write-Host "=====================================" -ForegroundColor Cyan
-Write-Host "Privacy Filter Installer Build Script" -ForegroundColor Cyan
+Write-Host "Vague Installer Build Script" -ForegroundColor Cyan
 Write-Host "=====================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -33,10 +33,10 @@ try {
 
 # Step 2: Build the main application
 Write-Host ""
-Write-Host "[2/5] Building PrivacyFilter application..." -ForegroundColor Yellow
+Write-Host "[2/5] Building Vague application..." -ForegroundColor Yellow
 Set-Location $ProjectRoot
 try {
-    dotnet publish PrivacyFilter.csproj -c $Configuration -r win-x64 --self-contained false -p:PublishSingleFile=false
+    dotnet publish Vague.csproj -c $Configuration -r win-x64 --self-contained false -p:PublishSingleFile=false
     Write-Host "Application built successfully!" -ForegroundColor Green
 } catch {
     Write-Host "Error building application: $_" -ForegroundColor Red
@@ -51,9 +51,9 @@ if (-not (Test-Path $PublishDir)) {
     Write-Host "Error: Publish directory not found at $PublishDir" -ForegroundColor Red
     exit 1
 }
-$ExePath = Join-Path $PublishDir "PrivacyFilter.exe"
+$ExePath = Join-Path $PublishDir "Vague.exe"
 if (-not (Test-Path $ExePath)) {
-    Write-Host "Error: PrivacyFilter.exe not found in publish directory" -ForegroundColor Red
+    Write-Host "Error: Vague.exe not found in publish directory" -ForegroundColor Red
     exit 1
 }
 Write-Host "Build output verified!" -ForegroundColor Green
@@ -64,7 +64,7 @@ Write-Host "[4/5] Building MSI installer..." -ForegroundColor Yellow
 Set-Location $InstallerDir
 try {
     # Use dotnet build with WiX v5 SDK
-    dotnet build PrivacyFilter.wixproj -c $Configuration
+    dotnet build Vague.wixproj -c $Configuration
     Write-Host "Installer built successfully!" -ForegroundColor Green
 } catch {
     Write-Host "Error building installer: $_" -ForegroundColor Red
@@ -74,7 +74,7 @@ try {
 # Step 5: Locate and display the installer
 Write-Host ""
 Write-Host "[5/5] Locating installer..." -ForegroundColor Yellow
-$MsiPath = Join-Path $OutputDir "PrivacyFilterInstaller.msi"
+$MsiPath = Join-Path $OutputDir "VagueInstaller.msi"
 if (Test-Path $MsiPath) {
     Write-Host ""
     Write-Host "=====================================" -ForegroundColor Green

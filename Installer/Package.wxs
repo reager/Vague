@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Package Name="Privacy Filter" 
-           Manufacturer="PrivacyFilter" 
+  <Package Name="Vague" 
+           Manufacturer="Daniel Hansen" 
            Version="1.0.0.0" 
            UpgradeCode="A1B2C3D4-E5F6-4A5B-8C9D-0E1F2A3B4C5D">
     
@@ -12,12 +12,12 @@
     <Property Id="ARPPRODUCTICON" Value="AppIcon" />
     
     <StandardDirectory Id="LocalAppDataFolder">
-      <Directory Id="INSTALLFOLDER" Name="PrivacyFilter">
+      <Directory Id="INSTALLFOLDER" Name="Vague">
         <Component Id="MainExecutable" Guid="B2C3D4E5-F6A7-4B5C-9D0E-1F2A3B4C5D6E">
-          <File Id="PrivacyFilterExe" 
-                Source="..\bin\Release\net10.0-windows\win-x64\publish\PrivacyFilter.exe" />
+          <File Id="VagueExe" 
+                Source="..\bin\Release\net10.0-windows\win-x64\publish\Vague.exe" />
           <RegistryValue Root="HKCU" 
-                         Key="Software\PrivacyFilter" 
+                         Key="Software\Vague" 
                          Name="InstallPath" 
                          Type="string" 
                          Value="[INSTALLFOLDER]" 
@@ -26,10 +26,10 @@
         </Component>
         
         <Component Id="AppDll" Guid="C3D4E5F6-A7B8-4C5D-0E1F-2A3B4C5D6E7F">
-          <File Id="PrivacyFilterDll" 
-                Source="..\bin\Release\net10.0-windows\win-x64\publish\PrivacyFilter.dll" />
+          <File Id="VagueDll" 
+                Source="..\bin\Release\net10.0-windows\win-x64\publish\Vague.dll" />
           <RegistryValue Root="HKCU" 
-                         Key="Software\PrivacyFilter" 
+                         Key="Software\Vague" 
                          Name="AppDll" 
                          Type="integer" 
                          Value="1" 
@@ -38,9 +38,9 @@
 
         <Component Id="RuntimeConfigComp" Guid="D4E5F6A7-B8C9-4D5E-1F2A-3B4C5D6E7F8A">
           <File Id="RuntimeConfigJson" 
-                Source="..\bin\Release\net10.0-windows\win-x64\publish\PrivacyFilter.runtimeconfig.json" />
+                Source="..\bin\Release\net10.0-windows\win-x64\publish\Vague.runtimeconfig.json" />
           <RegistryValue Root="HKCU" 
-                         Key="Software\PrivacyFilter" 
+                         Key="Software\Vague" 
                          Name="RuntimeConfig" 
                          Type="integer" 
                          Value="1" 
@@ -49,9 +49,9 @@
 
         <Component Id="DepsJsonComp" Guid="E5F6A7B8-C9D0-4E5F-2A3B-4C5D6E7F8A9B">
           <File Id="DepsJsonFile" 
-                Source="..\bin\Release\net10.0-windows\win-x64\publish\PrivacyFilter.deps.json" />
+                Source="..\bin\Release\net10.0-windows\win-x64\publish\Vague.deps.json" />
           <RegistryValue Root="HKCU" 
-                         Key="Software\PrivacyFilter" 
+                         Key="Software\Vague" 
                          Name="DepsJson" 
                          Type="integer" 
                          Value="1" 
@@ -61,16 +61,16 @@
     </StandardDirectory>
 
     <StandardDirectory Id="ProgramMenuFolder">
-      <Directory Id="ProgramMenuDir" Name="Privacy Filter">
+      <Directory Id="ProgramMenuDir" Name="Vague">
         <Component Id="ProgramMenuShortcut" Guid="A7B8C9D0-E1F2-4A5B-4C5D-6E7F8A9B0C1D">
           <Shortcut Id="StartMenuShortcut"
-                    Name="Privacy Filter"
-                    Target="[INSTALLFOLDER]PrivacyFilter.exe"
+                    Name="Vague"
+                    Target="[INSTALLFOLDER]Vague.exe"
                     WorkingDirectory="INSTALLFOLDER"
                     Icon="AppIcon" />
           <RemoveFolder Id="RemoveProgramMenuDir" On="uninstall"/>
           <RegistryValue Root="HKCU" 
-                         Key="Software\PrivacyFilter" 
+                         Key="Software\Vague" 
                          Name="installed" 
                          Type="integer" 
                          Value="1" 
@@ -82,12 +82,12 @@
     <StandardDirectory Id="DesktopFolder">
       <Component Id="DesktopShortcutComp" Guid="B8C9D0E1-F2A3-4B5C-5D6E-7F8A9B0C1D2E">
         <Shortcut Id="DesktopShortcut"
-                  Name="Privacy Filter"
-                  Target="[INSTALLFOLDER]PrivacyFilter.exe"
+                  Name="Vague"
+                  Target="[INSTALLFOLDER]Vague.exe"
                   WorkingDirectory="INSTALLFOLDER"
                   Icon="AppIcon" />
         <RegistryValue Root="HKCU" 
-                       Key="Software\PrivacyFilter" 
+                       Key="Software\Vague" 
                        Name="desktop" 
                        Type="integer" 
                        Value="1" 
@@ -95,7 +95,7 @@
       </Component>
     </StandardDirectory>
 
-    <Feature Id="MainFeature" Title="Privacy Filter" Level="1">
+    <Feature Id="MainFeature" Title="Vague" Level="1">
       <ComponentRef Id="MainExecutable" />
       <ComponentRef Id="AppDll" />
       <ComponentRef Id="RuntimeConfigComp" />

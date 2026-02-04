@@ -4,7 +4,7 @@ using System.IO;
 using System.Text.Json;
 using System.Linq;
 
-namespace PrivacyFilter.Services
+namespace Vague.Services
 {
     public class SettingsService
     {
@@ -13,12 +13,12 @@ namespace PrivacyFilter.Services
         public SettingsService()
         {
             var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            var appFolder = Path.Combine(appDataPath, "PrivacyFilter");
+            var appFolder = Path.Combine(appDataPath, "Vague");
             Directory.CreateDirectory(appFolder);
             _settingsPath = Path.Combine(appFolder, "settings.json");
         }
 
-        public void SaveSettings(PrivacyFilterSettings settings)
+        public void SaveSettings(VagueSettings settings)
         {
             try
             {
@@ -33,26 +33,26 @@ namespace PrivacyFilter.Services
             }
         }
 
-        public PrivacyFilterSettings LoadSettings()
+        public VagueSettings LoadSettings()
         {
             try
             {
                 if (File.Exists(_settingsPath))
                 {
                     var json = File.ReadAllText(_settingsPath);
-                    var settings = JsonSerializer.Deserialize<PrivacyFilterSettings>(json);
-                    return settings ?? new PrivacyFilterSettings();
+                    var settings = JsonSerializer.Deserialize<VagueSettings>(json);
+                    return settings ?? new VagueSettings();
                 }
             }
             catch
             {
             }
             
-            return new PrivacyFilterSettings();
+            return new VagueSettings();
         }
     }
 
-    public class PrivacyFilterSettings
+    public class VagueSettings
     {
         public List<SavedProcessInfo> PrivateProcesses { get; set; } = new();
         public bool MinimizeToTrayOnStartup { get; set; } = true;

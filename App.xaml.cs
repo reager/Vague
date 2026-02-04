@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace PrivacyFilter
+namespace Vague
 {
     public partial class App : Application
     {

@@ -2,9 +2,9 @@ using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Threading;
-using PrivacyFilter.Models;
+using Vague.Models;
 
-namespace PrivacyFilter.Services
+namespace Vague.Services
 {
     public class WindowMonitorService
     {

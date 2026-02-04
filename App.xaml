@@ -1,7 +1,7 @@
-<Application x:Class="PrivacyFilter.App"
+<Application x:Class="Vague.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:PrivacyFilter"
+             xmlns:local="clr-namespace:Vague"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>

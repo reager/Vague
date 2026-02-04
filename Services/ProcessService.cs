@@ -4,9 +4,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using PrivacyFilter.Models;
+using Vague.Models;
 
-namespace PrivacyFilter.Services
+namespace Vague.Services
 {
     public class ProcessService
     {

@@ -1,6 +1,6 @@
 <Project Sdk="WixToolset.Sdk/5.0.2">
   <PropertyGroup>
-    <OutputName>PrivacyFilterInstaller</OutputName>
+    <OutputName>VagueInstaller</OutputName>
     <OutputType>Package</OutputType>
   </PropertyGroup>
 </Project>

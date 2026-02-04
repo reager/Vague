@@ -8,10 +8,10 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Forms;
 using System.Windows.Input;
-using PrivacyFilter.Models;
-using PrivacyFilter.ViewModels;
+using Vague.Models;
+using Vague.ViewModels;
 
-namespace PrivacyFilter
+namespace Vague
 {
     public partial class MainWindow : Window
     {
@@ -42,7 +42,7 @@ namespace PrivacyFilter
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            StatusText.Text = "Privacy Filter initialized. Select processes to add to private list.";
+            StatusText.Text = "Vague initialized. Select processes to add to private list.";
 
             if (_viewModel.MinimizeToTrayOnStartup)
             {

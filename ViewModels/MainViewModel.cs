@@ -4,10 +4,10 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Linq;
 using System.Windows.Threading;
-using PrivacyFilter.Models;
-using PrivacyFilter.Services;
+using Vague.Models;
+using Vague.Services;
 
-namespace PrivacyFilter.ViewModels
+namespace Vague.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
@@ -234,7 +234,7 @@ namespace PrivacyFilter.ViewModels
 
         private void SaveSettings()
         {
-            var settings = new PrivacyFilterSettings
+            var settings = new VagueSettings
             {
                 PrivateProcesses = PrivateProcesses.Select(p => new SavedProcessInfo
                 {

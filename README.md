@@ -34,7 +34,7 @@ Administrator privileges are **optional**.
 ### Option 1: Using the Installer (Recommended)
 
 1. Download or build the MSI installer
-2. Double-click `PrivacyFilterInstaller.msi` to install
+2. Double-click `VagueInstaller.msi` to install
 3. Launch from Start Menu or Desktop shortcut
 
 ### Option 2: Build from Source
@@ -57,7 +57,7 @@ To create the MSI installer:
    .\temp\build-installer.ps1
    ```
 
-3. The installer will be created at: `Installer\bin\Release\PrivacyFilterInstaller.msi`
+3. The installer will be created at: `Installer\bin\Release\VagueInstaller.msi`
 
 The installer includes:
 - Main application executable and dependencies
@@ -68,7 +68,7 @@ The installer includes:
 
 ## Usage
 
-1. **Launch the Application**: Run PrivacyFilter.exe
+1. **Launch the Application**: Run Vague.exe
 2. **View Running Processes**: The left panel shows all processes with visible windows
 3. **Add to Private List**: Select a process and click "Add to Private" (default blur: 95%)
 4. **Adjust Blur Level**: Use the slider to set blur intensity (0-100%)
@@ -92,7 +92,7 @@ The application uses Windows APIs to:
 - Monitor window focus changes via Windows event hooks
 - Dynamically adjust blur based on window state
 - Separate browser processes (Chrome, Edge, Firefox, etc.) by window/tab for individual control
-- Persist settings to `%AppData%\PrivacyFilter\settings.json` for automatic restoration on restart
+- Persist settings to `%AppData%\Vague\settings.json` for automatic restoration on restart
 
 ## Security
 

@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace PrivacyFilter.Models
+namespace Vague.Models
 {
     public class ProcessInfo : INotifyPropertyChanged
     {
