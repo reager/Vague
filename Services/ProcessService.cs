@@ -53,7 +53,7 @@ namespace Vague.Services
                             }
                             else
                             {
-                                uniqueKey = process.Id.ToString();
+                                uniqueKey = $"{process.Id}|{hWnd}";
                             }
                             
                             if (!seenWindows.Contains(uniqueKey))

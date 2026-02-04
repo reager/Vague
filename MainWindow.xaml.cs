@@ -194,33 +194,46 @@ namespace Vague
             }
         }
 
-        private void PrivateProcessesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void PrivateProcessesTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (_viewModel.SelectedPrivateProcess != null)
-            {
-                var processName = _viewModel.SelectedPrivateProcess.Name;
-                _viewModel.RemoveFromPrivate(_viewModel.SelectedPrivateProcess);
-                StatusText.Text = $"Removed {processName} from private list.";
-            }
+            _viewModel.SelectedPrivateItem = e.NewValue;
         }
 
         private void BlurIncrement_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is FrameworkElement element && element.DataContext is ProcessInfo process)
+            if (sender is FrameworkElement element)
             {
-                var newValue = Math.Clamp(process.BlurLevel + BlurStep, 0, 100);
-                _viewModel.UpdateBlurLevel(process, newValue);
-                StatusText.Text = $"Blur level updated to {newValue}% for {process.Name}.";
+                if (element.DataContext is ProcessInfo process)
+                {
+                    var newValue = Math.Clamp(process.BlurLevel + BlurStep, 0, 100);
+                    _viewModel.UpdateBlurLevel(process, newValue);
+                    StatusText.Text = $"Blur level updated to {newValue}% for {process.Name}.";
+                }
+                else if (element.DataContext is ProcessGroup group)
+                {
+                    var newValue = Math.Clamp(group.BlurLevel + BlurStep, 0, 100);
+                    _viewModel.UpdateBlurLevel(group, newValue);
+                    StatusText.Text = $"Blur level updated to {newValue}% for {group.ProcessName}.";
+                }
             }
         }
 
         private void BlurDecrement_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is FrameworkElement element && element.DataContext is ProcessInfo process)
+            if (sender is FrameworkElement element)
             {
-                var newValue = Math.Clamp(process.BlurLevel - BlurStep, 0, 100);
-                _viewModel.UpdateBlurLevel(process, newValue);
-                StatusText.Text = $"Blur level updated to {newValue}% for {process.Name}.";
+                if (element.DataContext is ProcessInfo process)
+                {
+                    var newValue = Math.Clamp(process.BlurLevel - BlurStep, 0, 100);
+                    _viewModel.UpdateBlurLevel(process, newValue);
+                    StatusText.Text = $"Blur level updated to {newValue}% for {process.Name}.";
+                }
+                else if (element.DataContext is ProcessGroup group)
+                {
+                    var newValue = Math.Clamp(group.BlurLevel - BlurStep, 0, 100);
+                    _viewModel.UpdateBlurLevel(group, newValue);
+                    StatusText.Text = $"Blur level updated to {newValue}% for {group.ProcessName}.";
+                }
             }
         }
 
@@ -248,23 +261,40 @@ namespace Vague
             if (sender is not System.Windows.Controls.TextBox textBox)
                 return;
 
-            if (textBox.DataContext is not ProcessInfo process)
-                return;
-
-            if (!int.TryParse(textBox.Text, out var value))
+            if (textBox.DataContext is ProcessInfo process)
             {
-                textBox.Text = process.BlurLevel.ToString(CultureInfo.InvariantCulture);
-                return;
-            }
+                if (!int.TryParse(textBox.Text, out var value))
+                {
+                    textBox.Text = process.BlurLevel.ToString(CultureInfo.InvariantCulture);
+                    return;
+                }
 
-            var clamped = Math.Clamp(value, 0, 100);
-            if (clamped != value)
+                var clamped = Math.Clamp(value, 0, 100);
+                if (clamped != value)
+                {
+                    textBox.Text = clamped.ToString(CultureInfo.InvariantCulture);
+                }
+
+                _viewModel.UpdateBlurLevel(process, clamped);
+                StatusText.Text = $"Blur level updated to {clamped}% for {process.Name}.";
+            }
+            else if (textBox.DataContext is ProcessGroup group)
             {
-                textBox.Text = clamped.ToString(CultureInfo.InvariantCulture);
-            }
+                if (!int.TryParse(textBox.Text, out var value))
+                {
+                    textBox.Text = group.BlurLevel.ToString(CultureInfo.InvariantCulture);
+                    return;
+                }
 
-            _viewModel.UpdateBlurLevel(process, clamped);
-            StatusText.Text = $"Blur level updated to {clamped}% for {process.Name}.";
+                var clamped = Math.Clamp(value, 0, 100);
+                if (clamped != value)
+                {
+                    textBox.Text = clamped.ToString(CultureInfo.InvariantCulture);
+                }
+
+                _viewModel.UpdateBlurLevel(group, clamped);
+                StatusText.Text = $"Blur level updated to {clamped}% for {group.ProcessName}.";
+            }
         }
 
         private void AutoUnblur_Changed(object sender, RoutedEventArgs e)
@@ -282,6 +312,18 @@ namespace Vague
                 if (_trayMinimizeOnStartupItem != null)
                 {
                     _trayMinimizeOnStartupItem.Checked = _viewModel.MinimizeToTrayOnStartup;
+                }
+                _viewModel.SaveSettingsFromUI();
+            }
+        }
+
+        private void BlurAllWindows_Changed(object sender, RoutedEventArgs e)
+        {
+            if (_viewModel != null && sender is System.Windows.Controls.CheckBox checkBox && checkBox.DataContext is ProcessGroup group)
+            {
+                foreach (var child in group.ChildWindows)
+                {
+                    _viewModel.UpdateBlurLevel(child, child.BlurLevel);
                 }
                 _viewModel.SaveSettingsFromUI();
             }

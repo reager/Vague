@@ -213,7 +213,16 @@ namespace Vague.Services
                     if (!IsValidWindow(process.MainWindowHandle))
                         continue;
 
-                    var isThisWindowActive = process == matchedProcess;
+                    bool isThisWindowActive;
+                    
+                    if (process.BlurAllWindows)
+                    {
+                        isThisWindowActive = matchedProcess != null && process.Id == matchedProcess.Id;
+                    }
+                    else
+                    {
+                        isThisWindowActive = process == matchedProcess;
+                    }
 
                     if (isThisWindowActive)
                     {

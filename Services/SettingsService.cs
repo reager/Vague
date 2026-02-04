@@ -64,5 +64,6 @@ namespace Vague.Services
         public string WindowTitle { get; set; } = string.Empty;
         public int BlurLevel { get; set; } = 95;
         public bool AutoUnblurOnFocus { get; set; } = true;
+        public bool BlurAllWindows { get; set; } = true;
     }
 }

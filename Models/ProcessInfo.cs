@@ -10,12 +10,16 @@ namespace Vague.Models
         private int _blurLevel = 95;
         private bool _isActive;
         private bool _autoUnblurOnFocus = true;
+        private bool _blurAllWindows = true;
         private string _currentWindowTitle = string.Empty;
 
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string MainWindowTitle { get; set; } = string.Empty;
         public bool IsPrivate { get; set; }
+        public ProcessGroup? ParentGroup { get; set; }
+        
+        public bool CanEditIndividually => ParentGroup == null || !ParentGroup.BlurAllWindows;
         
         public int BlurLevel 
         { 
@@ -56,6 +60,19 @@ namespace Vague.Models
             }
         }
 
+        public bool BlurAllWindows
+        {
+            get => _blurAllWindows;
+            set
+            {
+                if (_blurAllWindows != value)
+                {
+                    _blurAllWindows = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public string CurrentWindowTitle
         {
             get => _currentWindowTitle;
@@ -91,7 +108,7 @@ namespace Vague.Models
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        public void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

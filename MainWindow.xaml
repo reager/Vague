@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Vague"
+        xmlns:models="clr-namespace:Vague.Models"
         mc:Ignorable="d"
         Title="Vague" Height="900" Width="1600" MinHeight="800" MinWidth="1400"
         Icon="pack://application:,,,/gfx/icon.png"
@@ -98,42 +99,59 @@
         
         <!-- Private Processes -->
         <StackPanel Grid.Row="1" Grid.Column="1" Margin="5,0,0,0">
-            <Label Content="Private Processes" FontWeight="Bold" Margin="0,0,0,5"/>
-            <ListView x:Name="PrivateProcessesList" ItemsSource="{Binding PrivateProcesses}" 
-                     SelectedItem="{Binding SelectedPrivateProcess}" Height="400" MouseDoubleClick="PrivateProcessesList_MouseDoubleClick">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Process Name" DisplayMemberBinding="{Binding Name}"/>
-                        <GridViewColumn Header="Current Title" DisplayMemberBinding="{Binding CurrentWindowTitle}" Width="420"/>
-                        <GridViewColumn Header="Blur" Width="140">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <DockPanel LastChildFill="False">
-                                        <Button Content="-" Width="26" Height="22" Click="BlurDecrement_Click"/>
-                                        <TextBox Width="60" Height="22" Margin="6,0" Text="{Binding BlurLevel}" 
-                                                 VerticalContentAlignment="Center"
-                                                 LostFocus="BlurTextBox_LostFocus"
-                                                 KeyDown="BlurTextBox_KeyDown"/>
-                                        <Button Content="+" Width="26" Height="22" Click="BlurIncrement_Click"/>
-                                    </DockPanel>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="Status" DisplayMemberBinding="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}"/>
-                        <GridViewColumn Header="Auto-Unblur" Width="90">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding AutoUnblurOnFocus, Mode=TwoWay}" 
-                                             HorizontalAlignment="Center" 
-                                             VerticalAlignment="Center"
-                                             Checked="AutoUnblur_Changed"
-                                             Unchecked="AutoUnblur_Changed"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+            <Label Content="Private Processes (Grouped by Process)" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TreeView x:Name="PrivateProcessesTree" ItemsSource="{Binding PrivateProcessGroups}" 
+                     SelectedItemChanged="PrivateProcessesTree_SelectedItemChanged" Height="400" Background="#3c3c3c" BorderBrush="#666666">
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type models:ProcessGroup}" ItemsSource="{Binding ChildWindows}">
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Text="{Binding DisplayText}" Foreground="White" FontWeight="Bold" Width="400"/>
+                            <StackPanel Orientation="Horizontal" Margin="10,0,0,0" IsEnabled="{Binding BlurAllWindows}">
+                                <TextBlock Text="Blur:" Foreground="White" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                <Button Content="-" Width="26" Height="22" Click="BlurDecrement_Click"/>
+                                <TextBox Width="60" Height="22" Margin="6,0" Text="{Binding BlurLevel}" 
+                                         VerticalContentAlignment="Center"
+                                         LostFocus="BlurTextBox_LostFocus"
+                                         KeyDown="BlurTextBox_KeyDown"/>
+                                <Button Content="+" Width="26" Height="22" Click="BlurIncrement_Click"/>
+                            </StackPanel>
+                            <CheckBox Content="Auto-Unblur" IsChecked="{Binding AutoUnblurOnFocus, Mode=TwoWay}" 
+                                     Foreground="White" Margin="10,0,0,0" VerticalAlignment="Center"
+                                     IsEnabled="{Binding BlurAllWindows}"
+                                     Checked="AutoUnblur_Changed" Unchecked="AutoUnblur_Changed"/>
+                            <CheckBox Content="Group All Windows" IsChecked="{Binding BlurAllWindows, Mode=TwoWay}" 
+                                     Foreground="White" Margin="10,0,0,0" VerticalAlignment="Center"
+                                     Checked="BlurAllWindows_Changed" Unchecked="BlurAllWindows_Changed"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type models:ProcessInfo}">
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Text="{Binding CurrentWindowTitle}" Foreground="White" Width="400"/>
+                            <StackPanel Orientation="Horizontal" Margin="10,0,0,0" IsEnabled="{Binding CanEditIndividually}">
+                                <TextBlock Text="Blur:" Foreground="White" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                <Button Content="-" Width="26" Height="22" Click="BlurDecrement_Click"/>
+                                <TextBox Width="60" Height="22" Margin="6,0" Text="{Binding BlurLevel}" 
+                                         VerticalContentAlignment="Center"
+                                         LostFocus="BlurTextBox_LostFocus"
+                                         KeyDown="BlurTextBox_KeyDown"/>
+                                <Button Content="+" Width="26" Height="22" Click="BlurIncrement_Click"/>
+                            </StackPanel>
+                            <TextBlock Text="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}" 
+                                      Foreground="White" Margin="10,0,0,0" VerticalAlignment="Center" Width="60"/>
+                            <CheckBox Content="Auto-Unblur" IsChecked="{Binding AutoUnblurOnFocus, Mode=TwoWay}" 
+                                     Foreground="White" Margin="10,0,0,0" VerticalAlignment="Center"
+                                     IsEnabled="{Binding CanEditIndividually}"
+                                     Checked="AutoUnblur_Changed" Unchecked="AutoUnblur_Changed"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </TreeView.Resources>
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="TreeViewItem">
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="IsExpanded" Value="True"/>
+                    </Style>
+                </TreeView.ItemContainerStyle>
+            </TreeView>
             
             <StackPanel Margin="0,10,0,0">
                 <CheckBox Content="Minimize to tray on startup" Foreground="White"
