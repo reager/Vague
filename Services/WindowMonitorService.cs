@@ -29,6 +29,14 @@ namespace PrivacyFilter.Services
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool IsWindowVisible(IntPtr hWnd);
 
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool IsWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool IsIconic(IntPtr hWnd);
+
         private const uint GA_ROOT = 2;
         private const uint GA_ROOTOWNER = 3;
 
@@ -161,6 +169,8 @@ namespace PrivacyFilter.Services
                     return;
 
                 var activatedRoot = NormalizeToRootWindow(activatedWindow);
+                if (activatedRoot == IntPtr.Zero)
+                    return;
 
                 GetWindowThreadProcessId(activatedWindow, out var activatedProcessId);
                 var activatedPid = (int)activatedProcessId;
@@ -171,13 +181,27 @@ namespace PrivacyFilter.Services
                     processesCopy = new List<ProcessInfo>(_privateProcesses);
                 }
 
-                var pidMatchCount = 0;
-                if (activatedPid != 0)
+                if (processesCopy.Count == 0)
+                    return;
+
+                ProcessInfo? matchedProcess = null;
+
+                foreach (var process in processesCopy)
                 {
-                    foreach (var p in processesCopy)
+                    if (expectedToken != Volatile.Read(ref _foregroundEventToken))
+                        return;
+
+                    if (!IsValidWindow(process.MainWindowHandle))
+                        continue;
+
+                    var processRoot = NormalizeToRootWindow(process.MainWindowHandle);
+                    if (processRoot == IntPtr.Zero)
+                        continue;
+
+                    if (processRoot == activatedRoot)
                     {
-                        if (p.Id == activatedPid)
-                            pidMatchCount++;
+                        matchedProcess = process;
+                        break;
                     }
                 }
 
@@ -186,30 +210,50 @@ namespace PrivacyFilter.Services
                     if (expectedToken != Volatile.Read(ref _foregroundEventToken))
                         return;
 
-                    var processRoot = NormalizeToRootWindow(process.MainWindowHandle);
+                    if (!IsValidWindow(process.MainWindowHandle))
+                        continue;
 
-                    var isActive = (processRoot != IntPtr.Zero && processRoot == activatedRoot
-                        || (activatedPid != 0 && pidMatchCount == 1 && process.Id == activatedPid))
-                        && IsWindowVisible(process.MainWindowHandle);
+                    var isThisWindowActive = process == matchedProcess;
 
-                    if (isActive)
+                    if (isThisWindowActive)
                     {
+                        process.IsActive = true;
                         if (process.AutoUnblurOnFocus)
                         {
                             _blurService.RemoveBlur(process.MainWindowHandle);
                         }
-                        process.IsActive = true;
+                        else
+                        {
+                            _blurService.ApplyBlur(process.MainWindowHandle, process.BlurLevel);
+                        }
                     }
-                    else if (process.MainWindowHandle != IntPtr.Zero)
+                    else
                     {
-                        _blurService.ApplyBlur(process.MainWindowHandle, process.BlurLevel);
                         process.IsActive = false;
+                        _blurService.ApplyBlur(process.MainWindowHandle, process.BlurLevel);
                     }
                 }
             }
             catch
             {
             }
+        }
+
+        private bool IsValidWindow(IntPtr hWnd)
+        {
+            if (hWnd == IntPtr.Zero)
+                return false;
+
+            if (!IsWindow(hWnd))
+                return false;
+
+            if (!IsWindowVisible(hWnd))
+                return false;
+
+            if (IsIconic(hWnd))
+                return false;
+
+            return true;
         }
     }
 }
