@@ -18,6 +18,7 @@ namespace Vague.ViewModels
 
         private readonly DispatcherTimer _titleRefreshTimer;
         private readonly DispatcherTimer _settingsSaveTimer;
+        private readonly DispatcherTimer _processRefreshTimer;
 
         private bool _minimizeToTrayOnStartup = true;
 
@@ -83,6 +84,13 @@ namespace Vague.ViewModels
             };
             _settingsSaveTimer.Tick += (_, __) => FlushDebouncedSettingsSave();
 
+            _processRefreshTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(5)
+            };
+            _processRefreshTimer.Tick += (_, __) => RefreshProcesses();
+            _processRefreshTimer.Start();
+
             LoadProcesses();
             LoadSavedSettings();
             _monitorService.StartMonitoring();
@@ -129,6 +137,40 @@ namespace Vague.ViewModels
         public void RefreshProcesses()
         {
             LoadProcesses();
+            DetectAndAddNewPrivateProcesses();
+        }
+
+        private void DetectAndAddNewPrivateProcesses()
+        {
+            foreach (var group in PrivateProcessGroups.ToList())
+            {
+                var newProcesses = Processes
+                    .Where(p => p.Name.Equals(group.ProcessName, StringComparison.OrdinalIgnoreCase) &&
+                               !group.ChildWindows.Any(c => c.MainWindowHandle == p.MainWindowHandle))
+                    .ToList();
+
+                foreach (var newProcess in newProcesses)
+                {
+                    newProcess.IsPrivate = true;
+                    newProcess.IsActive = false;
+                    newProcess.BlurLevel = group.BlurAllWindows ? group.BlurLevel : 0;
+                    newProcess.AutoUnblurOnFocus = group.AutoUnblurOnFocus;
+                    newProcess.BlurAllWindows = group.BlurAllWindows;
+                    newProcess.ParentGroup = group;
+                    group.ChildWindows.Add(newProcess);
+
+                    if (group.BlurAllWindows)
+                    {
+                        _blurService.ApplyBlur(newProcess.MainWindowHandle, newProcess.BlurLevel);
+                    }
+                }
+
+                if (newProcesses.Count > 0)
+                {
+                    UpdateMonitorService();
+                    SaveSettings();
+                }
+            }
         }
 
         public void AddToPrivate()
@@ -148,25 +190,36 @@ namespace Vague.ViewModels
             if (allWindowsFromProcess.Count == 0)
                 return;
 
+            bool groupAllWindows = allWindowsFromProcess.Count == 1;
+
             var newGroup = new ProcessGroup
             {
                 ProcessId = SelectedProcess.Id,
                 ProcessName = SelectedProcess.Name,
                 BlurLevel = SelectedProcess.BlurLevel,
                 AutoUnblurOnFocus = SelectedProcess.AutoUnblurOnFocus,
-                BlurAllWindows = SelectedProcess.BlurAllWindows
+                BlurAllWindows = groupAllWindows
             };
 
             foreach (var process in allWindowsFromProcess)
             {
                 process.IsPrivate = true;
                 process.IsActive = false;
-                process.BlurLevel = newGroup.BlurLevel;
                 process.AutoUnblurOnFocus = newGroup.AutoUnblurOnFocus;
-                process.BlurAllWindows = newGroup.BlurAllWindows;
+                process.BlurAllWindows = groupAllWindows;
                 process.ParentGroup = newGroup;
+                
+                if (process.MainWindowHandle == SelectedProcess.MainWindowHandle)
+                {
+                    process.BlurLevel = newGroup.BlurLevel;
+                    _blurService.ApplyBlur(process.MainWindowHandle, process.BlurLevel);
+                }
+                else
+                {
+                    process.BlurLevel = 0;
+                }
+                
                 newGroup.ChildWindows.Add(process);
-                _blurService.ApplyBlur(process.MainWindowHandle, process.BlurLevel);
             }
 
             PrivateProcessGroups.Add(newGroup);
@@ -280,6 +333,21 @@ namespace Vague.ViewModels
             _settingsSaveTimer.Start();
         }
 
+        public void SetChildBlurToZero(ProcessInfo process)
+        {
+            if (process == null || process.ParentGroup == null)
+                return;
+
+            if (process.ParentGroup.BlurAllWindows)
+                return;
+
+            process.BlurLevel = 0;
+            _blurService.RemoveBlur(process.MainWindowHandle);
+            
+            _settingsSaveTimer.Stop();
+            _settingsSaveTimer.Start();
+        }
+
         private void UpdateMonitorService()
         {
             var allPrivateProcesses = PrivateProcessGroups
@@ -381,6 +449,7 @@ namespace Vague.ViewModels
 
             _titleRefreshTimer.Stop();
             _settingsSaveTimer.Stop();
+            _processRefreshTimer.Stop();
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

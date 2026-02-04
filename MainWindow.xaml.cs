@@ -199,6 +199,23 @@ namespace Vague
             _viewModel.SelectedPrivateItem = e.NewValue;
         }
 
+        private void PrivateProcessesTree_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (_viewModel.SelectedPrivateItem is ProcessGroup group)
+            {
+                _viewModel.RemoveFromPrivate();
+                StatusText.Text = $"Removed {group.ProcessName} from private list.";
+            }
+            else if (_viewModel.SelectedPrivateItem is ProcessInfo process)
+            {
+                if (process.ParentGroup != null && !process.ParentGroup.BlurAllWindows)
+                {
+                    _viewModel.SetChildBlurToZero(process);
+                    StatusText.Text = $"Blur set to 0% for {process.CurrentWindowTitle}.";
+                }
+            }
+        }
+
         private void BlurIncrement_Click(object sender, RoutedEventArgs e)
         {
             if (sender is FrameworkElement element)
